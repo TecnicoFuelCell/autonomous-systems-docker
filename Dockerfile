@@ -105,6 +105,12 @@ RUN pip3 install --ignore-installed --break-system-packages psutil \
     gtsam \
     ultralytics \
     casadi
+# Pin CUDA-enabled PyTorch to cu126 so the image keeps sm_50 kernels for older
+# GPUs (e.g. GTX 970 / compute 5.2). ultralytics pulls a newer cuXXX build by
+# default, which drops sm_50 and fails at inference time.
+RUN pip3 install --break-system-packages --force-reinstall --no-cache-dir \
+    torch==2.14.1 torchvision==0.29.1 \
+    --index-url https://download.pytorch.org/whl/cu126
 RUN pip3 install --break-system-packages --no-build-isolation --ignore-installed bezier
 
 # Set up ROS2 environment
