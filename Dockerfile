@@ -54,6 +54,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopenblas-dev \
     libjpeg-dev \
     zlib1g-dev \
+    libusb-1.0-dev \
+    libcurl4-openssl-dev \
     && locale-gen en_US en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -86,6 +88,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-robot-state-publisher \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-rosbridge-server \
+    ros-${ROS_DISTRO}-rtcm-msgs \
     ros-${ROS_DISTRO}-rqt-image-view \
     ros-${ROS_DISTRO}-rviz2 \
     ros-${ROS_DISTRO}-sensor-msgs \
