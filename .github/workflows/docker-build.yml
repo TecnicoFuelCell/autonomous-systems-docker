@@ -5,7 +5,10 @@
 name: Docker build
 
 on:
-  pull_request:
+  push:
+    branches: [jetson]
+  pull_request: 
+    branches: [jetson]
 
 concurrency:
   group: docker-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
