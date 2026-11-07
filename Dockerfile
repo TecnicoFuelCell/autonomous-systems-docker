@@ -43,10 +43,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     evtest \
     vim \
     wget \
+    libcurl4-openssl-dev \
     libeigen3-dev \
     libgl1 \
     libglib2.0-0t64 \
     libgtsam-dev \
+    libusb-1.0-0-dev \
     nlohmann-json3-dev \
     libopencv-dev \
     cmake \
@@ -69,6 +71,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-colcon-common-extensions \
     python3-rosdep \
     python3-vcstool \
+    ros-${ROS_DISTRO}-ament-index-cpp \
     ros-${ROS_DISTRO}-controller-manager \
     ros-${ROS_DISTRO}-compressed-depth-image-transport \
     ros-${ROS_DISTRO}-compressed-image-transport \
@@ -82,11 +85,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-joint-state-publisher \
     ros-${ROS_DISTRO}-nav-msgs \
     ros-${ROS_DISTRO}-nmea-msgs \
+    ros-${ROS_DISTRO}-rclcpp-components \
     ros-${ROS_DISTRO}-robot-localization \
     ros-${ROS_DISTRO}-robot-state-publisher \
     ros-${ROS_DISTRO}-ros-base \
     ros-${ROS_DISTRO}-rosbridge-server \
     ros-${ROS_DISTRO}-rqt-image-view \
+    ros-${ROS_DISTRO}-rtcm-msgs \
     ros-${ROS_DISTRO}-rviz2 \
     ros-${ROS_DISTRO}-sensor-msgs \
     ros-${ROS_DISTRO}-std-msgs \
@@ -102,6 +107,38 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-joy \
     python3-evdev \
     && rm -rf /var/lib/apt/lists/*
+
+# ---------------------------------------------------------------------------
+# Sensor drivers built from source.
+#
+# Neither driver is released for ROS 2 Jazzy. The released u-blox package only
+# supports F9P/F9R/X20P, so the ZED-X20D support and ublox_heading_imu_node
+# come from the MonKey-Robotics fork of aussierobots/ublox_dgnss. Both trees
+# are pinned to the commits validated on the bench. The Xsens package compiles
+# the vendor SDK from source, so it also builds on aarch64.
+#
+# They are installed into /opt/sensor_ws/install instead of being vendored
+# into the vehicle repository, which keeps the vehicle workspace clean.
+# ---------------------------------------------------------------------------
+ARG XSENS_MTI_COMMIT=6a35755f3c6e2c9091940e069ee18d6580297840
+ARG UBLOX_ZEDX20D_COMMIT=3f1b485d980cd4c4cefbde34a7d6e9729fbe57fa
+
+RUN mkdir -p /opt/sensor_ws/src \
+    && git clone https://github.com/bluespace-ai/bluespace_ai_xsens_ros_mti_driver.git \
+         /opt/sensor_ws/src/xsens_mti \
+    && git -C /opt/sensor_ws/src/xsens_mti checkout ${XSENS_MTI_COMMIT} \
+    && git clone https://github.com/MonKey-Robotics/ublox_zedx20d.git \
+         /opt/sensor_ws/src/ublox_zedx20d \
+    && git -C /opt/sensor_ws/src/ublox_zedx20d checkout ${UBLOX_ZEDX20D_COMMIT} \
+    && . /opt/ros/${ROS_DISTRO}/setup.sh \
+    && cd /opt/sensor_ws \
+    && colcon build --merge-install --install-base install \
+         --cmake-args -DCMAKE_BUILD_TYPE=Release \
+    && rm -rf /opt/sensor_ws/src /opt/sensor_ws/build /opt/sensor_ws/log
+
+# Make the sensor overlay available to login shells and `jetson docker enter`.
+RUN printf '[[ -f /opt/sensor_ws/install/setup.bash ]] && source /opt/sensor_ws/install/setup.bash\n' \
+      > /etc/profile.d/sensor_ws.sh
 
 RUN rosdep init || true
 RUN rosdep update
@@ -182,4 +219,4 @@ COPY .bashrc.example /etc/tfc/ros2.bashrc
 RUN printf '[[ -f /etc/tfc/ros2.bashrc ]] && source /etc/tfc/ros2.bashrc\n' >> /root/.bashrc \
     && echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /root/.bashrc
 
-CMD ["bash", "-lc", "source /opt/ros/${ROS_DISTRO}/setup.bash && exec bash"]
+CMD ["bash", "-lc", "source /opt/ros/${ROS_DISTRO}/setup.bash && source /opt/sensor_ws/install/setup.bash && exec bash"]
