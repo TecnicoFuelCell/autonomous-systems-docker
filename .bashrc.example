@@ -1,10 +1,12 @@
 # ROS2 workspace helpers — sourced on container startup. TFC_* variables are
 # injected by docker-compose.yml (from tfc_paths.env) and by `jetson docker enter`.
 [[ -f /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash ]] && source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash
+[[ -f /opt/sensor_ws/install/setup.bash ]] && source /opt/sensor_ws/install/setup.bash
 [[ -f install/setup.bash ]] && source install/setup.bash
 
 ros_source() {
   [[ -f /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash ]] && source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash
+  [[ -f /opt/sensor_ws/install/setup.bash ]] && source /opt/sensor_ws/install/setup.bash
   [[ -f install/setup.bash ]] && source install/setup.bash
 }
 
