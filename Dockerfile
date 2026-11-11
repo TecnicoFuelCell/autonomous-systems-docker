@@ -103,6 +103,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-evdev \
     && rm -rf /var/lib/apt/lists/*
 
+# Simulation: Gazebo Harmonic, ROS<->Gazebo bridge and ros2_control in Gazebo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-${ROS_DISTRO}-gz-ros2-control \
+    ros-${ROS_DISTRO}-ros2-control \
+    ros-${ROS_DISTRO}-ros2-controllers \
+    mesa-utils \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN rosdep init || true
 RUN rosdep update
 
