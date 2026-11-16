@@ -17,6 +17,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-pip python3-colcon-common-extensions python3-rosdep python3-vcstool \
         libeigen3-dev \
         ros-jazzy-nmea-msgs \
+        libglvnd0 libgl1 libglx0 libegl1 libglib2.0-0 mesa-utils \
+        ros-jazzy-ros-gz \
+        ros-jazzy-gz-ros2-control \
+        ros-jazzy-ros2-control \
+        ros-jazzy-ros2-controllers \
+        ros-jazzy-xacro \
+        ros-jazzy-joint-state-publisher \
+        ros-jazzy-cv-bridge \
+        ros-jazzy-rosbridge-suite \
     && rm -rf /var/lib/apt/lists/*
 
 # -----------------------------------------------------------------------------
@@ -40,12 +49,15 @@ RUN git clone --branch 4.2 --depth 1 https://github.com/borglab/gtsam.git /tmp/g
 # 3. Dependências Python (Python 3.12 nativo do Jazzy)
 # -----------------------------------------------------------------------------
 RUN pip3 install --no-cache-dir --break-system-packages --ignore-installed \
+        "numpy==1.26.4" \
         casadi \
-        bezier \
         transforms3d \
         rosbags \
         ultralytics \
         torch --extra-index-url https://download.pytorch.org/whl/cpu
+
+RUN pip3 install --no-cache-dir --break-system-packages --no-deps \
+        bezier==2024.6.20
 
 # -----------------------------------------------------------------------------
 # 4. Automar o source do ROS 2 e Workspace no .bashrc (para novas sessões)

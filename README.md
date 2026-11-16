@@ -1,6 +1,7 @@
 # Desktop environment
 
-This dockerfile aims to provide with only the most essential tools to work with the pipeline of the autonomous vehicle, namely Ros2 Jazzy, Python 3 (and its most used libraries) and GTSAM. It is intended to create an environment similar to the one on Jetson for local testing.
+This dockerfile aims to provide with only the most essential tools to work with the pipeline of the autonomous vehicle, namely Ros2 Jazzy, Python 3 (and its most used libraries) and GTSAM. It is intended to create an environment similar to the one on Jetson for local testing. It also includes Gazebo Harmonic and ros2_control, so it can run the simulation (`autonomous-systems-simulation`) as well as the core.
+
 
 ## Requirements
 
@@ -27,7 +28,7 @@ Building the image will take a while depending on the performance of your comput
 
 After building the image, you are ready to enter the container and use the tools inside, to do it run this command:
 ```sh
-docker run -it --rm -v <path_to_the_code_repo>:/local-ros2 <name_you_gave_to_the_image>
+docker run -it --rm -v <path_to_the_code_repo>:/opt/share/workspace <name_you_gave_to_the_image>
 ```
 
 If the applications in the container need to open a new window, you should add docker to the allowed hosts of xhost in order to allow display forwarding.
@@ -35,7 +36,7 @@ If the applications in the container need to open a new window, you should add d
 xhost +local:docker
 docker run -it --rm \
 -e DISPLAY=$DISPLAY \
--v <path_to_the_code_repo>:/local-ros2 \
+-v <path_to_the_code_repo>:/opt/share/workspace \
 -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 <name_you_gave_to_the_image>
 xhost -local:docker # disable display forwarding after running docker
