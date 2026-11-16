@@ -1,0 +1,32 @@
+# Build the Dockerfile on every push and pull request to the jetson and desktop branches.
+# This file must exist on each target branch, since GitHub reads workflows from the branch being pushed / PR'd into.
+# jetson: uses ubuntu-24.04-arm so the image matches aarch64/sbsa (NVIDIA keyring + ld.so path in Dockerfile).
+#   Note: GitHub-hosted ARM runners require a public repo (or paid larger runners); private repos may need self-hosted arm64 or buildx+qemu.
+# desktop: standard x86_64 image, built on ubuntu-24.04.
+
+name: Docker build
+
+on:
+  push:
+    branches: [jetson, desktop]
+  pull_request:
+    branches: [jetson, desktop]
+
+concurrency:
+  group: docker-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-build:
+    # base_ref is the PR target branch; ref_name is the pushed branch.
+    runs-on: ${{ (github.base_ref || github.ref_name) == 'jetson' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        run: docker build -t tfc-${{ github.base_ref || github.ref_name }}:ci .
