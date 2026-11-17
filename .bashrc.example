@@ -1,5 +1,5 @@
-foxglove_launch() {
-ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+ros_clean() {
+  rm -rf build install log
 }
 
 source install/setup.bash
