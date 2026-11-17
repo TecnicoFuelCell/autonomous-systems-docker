@@ -7,7 +7,13 @@ current_dir="$PWD"
 # defaults (fallback) - ALTERADOS PARA O SEU PROJETO
 default_image="autonomnom_ws"
 default_container="autonomnom_container"
-default_workspace="$(realpath -m "$current_dir/../autonomous-systems-core/ros2_ws")"
+
+read -rp "Project to mount (core/sim) [core]: " project
+project="${project:-core}"
+case "$project" in
+  sim)  default_workspace="$(realpath -m "$current_dir/../autonomous-systems-simulation")" ;;
+  *)    default_workspace="$(realpath -m "$current_dir/../autonomous-systems-core/ros2_ws")" ;;
+esac
 
 read -rp "Docker image name [$default_image]: " image_name
 image_name="${image_name:-$default_image}"
