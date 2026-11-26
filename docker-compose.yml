@@ -52,4 +52,4 @@ services:
       - /dev/video1
       - /dev/dri:/dev/dri
     working_dir: /workspace
-    command: bash -lc "source '${TFC_CONFIG_DIR}/tfc_paths.env' 2>/dev/null || true; source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash 2>/dev/null || true; [ -f install/setup.bash ] && source install/setup.bash 2>/dev/null || true; exec bash"
+    command: bash -lc "source '${TFC_CONFIG_DIR}/tfc_paths.env' 2>/dev/null || true; source /opt/ros/${ROS_DISTRO:-jazzy}/setup.bash 2>/dev/null || true; [ -f /opt/sensor_ws/install/setup.bash ] && source /opt/sensor_ws/install/setup.bash 2>/dev/null || true; [ -f install/setup.bash ] && source install/setup.bash 2>/dev/null || true; exec bash"
