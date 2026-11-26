@@ -108,15 +108,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-evdev \
     && rm -rf /var/lib/apt/lists/*
 
+# Simulation: Gazebo Harmonic, ROS<->Gazebo bridge and ros2_control in Gazebo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-${ROS_DISTRO}-gz-ros2-control \
+    ros-${ROS_DISTRO}-ros2-control \
+    ros-${ROS_DISTRO}-ros2-controllers \
+    mesa-utils \
+    && rm -rf /var/lib/apt/lists/*
+
 # ---------------------------------------------------------------------------
-# Sensor drivers built from source.
-#
-# Neither driver is released for ROS 2 Jazzy. The released u-blox package only
-# supports F9P/F9R/X20P, so the ZED-X20D support and ublox_heading_imu_node
-# come from the MonKey-Robotics fork of aussierobots/ublox_dgnss. Both trees
-# are pinned to the commits validated on the bench. The Xsens package compiles
-# the vendor SDK from source, so it also builds on aarch64.
-#
+# Sensor drivers built from source.#
 # They are installed into /opt/sensor_ws/install instead of being vendored
 # into the vehicle repository, which keeps the vehicle workspace clean.
 # ---------------------------------------------------------------------------
